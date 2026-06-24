@@ -1,0 +1,15 @@
+```gitignore
+
+
+ws_manip_club/build
+ws_manip_club/install
+ws_manip_club/log
+
+ws_moveit2/build
+ws_moveit2/install
+ws_moveit2/log
+
+
+
+
+```

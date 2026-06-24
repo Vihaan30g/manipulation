@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: gen5manipulator1
+    relative_path: urdf/gen5manipulator1.urdf
+  srdf:
+    relative_path: config/gen5manipulator1.srdf
+  package_settings:
+    author_name: Vihaan
+    author_email: vihaan30g@gmail.com
+    generated_timestamp: 1781682456
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

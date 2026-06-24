@@ -1,0 +1,8 @@
+# Default initial positions for gen5manipulator1's ros2_control fake system
+
+initial_positions:
+  base_rotation: 0.0
+  bevel_pitch: 0.0
+  bevel_roll: 0.0
+  link1_pitch: 0.0
+  link2_pitch: 0.0

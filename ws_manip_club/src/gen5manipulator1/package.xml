@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="3">
+
+  <name>gen5manipulator1</name>
+  <version>1.0.0</version>
+
+  <description>
+    URDF description package for gen5manipulatorfixed robot.
+    Contains URDF, meshes, RViz config, and launch files.
+  </description>
+
+  <maintainer email="TODO@example.com">Your Name</maintainer>
+
+  <license>BSD-3-Clause</license>
+
+  <!-- Build tool -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Runtime dependencies -->
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <!-- Optional Gazebo dependencies -->
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>

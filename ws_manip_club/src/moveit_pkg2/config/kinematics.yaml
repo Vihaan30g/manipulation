@@ -1,0 +1,11 @@
+body:
+  kinematics_solver: pick_ik/PickIkPlugin
+  kinematics_solver_timeout: 0.05
+  # Change 'speed' to 'global'
+  mode: global  
+  position_only: false
+  minimal_displacement_weight: 0.01
+  singular_value_threshold: 0.0001
+  dt: 0.1
+  allow_approximate_solutions: true
+  return_approximate_solution: true

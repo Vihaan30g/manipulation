@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="gen5manipulator1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find gen5manipulator1)/urdf/gen5manipulator1.urdf" />
+
+  <gazebo>
+    <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::Plugin">
+      <parameters>$(find moveit_pkg1)/config/ros2_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <xacro:macro name="gazebo_joint_properties" params="joint_name">
+    <gazebo reference="${joint_name}">
+      <implicitLowerLimit>${lower_limit}</implicitLowerLimit>
+      <implicitUpperLimit>${upper_limit}</implicitUpperLimit>
+    </gazebo>
+  </xacro:macro>
+
+</robot>
