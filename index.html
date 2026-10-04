@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manipulation: MoveIt 2 Workspace for a 5-DoF Arm | Vihaan Gupta</title>
+<meta name="description" content="A ROS 2 workspace for a 5-DoF manipulator: robot description, MoveIt 2 planning with OMPL and pick_ik, an Ignition Gazebo simulation, and pose-goal and joint-slider control tools.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--soft:#f6f8fa;--text:#1f2933;--muted:#5b6770;--line:#e1e5ea;--accent:#1d4ed8;--code:#0f172a;--codetext:#e2e8f0}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.7;font-size:17px}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+.bar{max-width:900px;margin:auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.bar a{color:var(--text);text-decoration:none;font-weight:600;font-size:15px}
+.bar a:hover{color:var(--accent)}
+main{max-width:900px;margin:auto;padding:32px 20px 60px}
+h1{font-size:2.1rem;line-height:1.25;margin:.2em 0}
+h2{font-size:1.5rem;margin:2.4em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:1.15rem;margin:1.6em 0 .4em}
+p{margin:.6em 0}
+p.lead{color:var(--muted);font-size:1.1rem}
+.meta{color:var(--muted);font-size:14px}
+a{color:var(--accent)}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.88em;background:var(--soft);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
+.cb{position:relative;margin:14px 0}
+pre{margin:0;background:var(--code);color:var(--codetext);padding:16px 18px;border-radius:8px;overflow-x:auto;font-family:"JetBrains Mono",Consolas,monospace;font-size:14px;line-height:1.55}
+pre.tree{background:var(--soft);color:var(--text);border:1px solid var(--line);font-size:13px}
+.cb button{position:absolute;top:8px;right:8px;background:#334155;color:#e2e8f0;border:0;border-radius:5px;padding:4px 10px;font-size:12px;cursor:pointer}
+.cb button:hover{background:#475569}
+.note,.warn{padding:12px 16px;border-radius:6px;margin:16px 0;border-left:4px solid var(--accent);background:#eff4ff}
+.warn{border-color:#b45309;background:#fff7ed}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+nav.toc{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:14px 22px;margin:22px 0}
+nav.toc ol{margin:6px 0 0;padding-left:20px;columns:2;column-gap:32px}
+@media(max-width:640px){nav.toc ol{columns:1}}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.btn{display:inline-block;padding:8px 16px;border-radius:6px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid var(--accent);background:var(--accent);color:#fff}
+.btn:hover{background:#1e40af}
+.btn.alt{background:#fff;color:var(--accent)}
+.btn.alt:hover{background:#eff4ff}
+.fig{margin:14px 0;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;text-align:center}
+.fig img{display:block;max-width:100%;height:auto;margin:auto;border-radius:4px;cursor:zoom-in}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+.video{margin:18px 0}
+.video .frame{position:relative;padding-top:56.25%;border-radius:8px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video figcaption{font-size:14px;color:var(--muted);margin-top:6px}
+.video .local{margin:0 0 10px;padding:10px 14px;border-radius:6px;border-left:4px solid #b45309;background:#fff7ed;font-size:14px;line-height:1.5}
+ul.tight{margin:.4em 0;padding-left:20px}ul.tight li{margin:4px 0}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:#eff4ff;color:var(--accent);border:1px solid #c7d6fb;vertical-align:middle}
+.node{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 12px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.node.hl{background:#eff4ff;border-color:var(--accent)}
+.node .step{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.node.hl .step{color:var(--accent)}
+.node strong{font-size:15px;line-height:1.3}
+.node small{font-size:12.5px;color:var(--muted);line-height:1.4}
+.node code{font-size:11.5px}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:6px;margin:14px 0}
+.flow .link{display:flex;flex-direction:column;align-items:center;color:var(--accent);width:112px}
+.flow .link svg{width:44px;height:16px}
+.flow .link span{font-size:11px;color:var(--muted);text-align:center;line-height:1.25;margin-top:3px;word-break:break-all;font-family:"JetBrains Mono",Consolas,monospace}
+@media(max-width:760px){.flow{grid-template-columns:1fr;justify-items:center}.flow .node{width:100%;max-width:340px}.flow .link{width:auto;flex-direction:row;gap:8px}.flow .link svg{transform:rotate(90deg);width:30px;height:30px}.flow .link span{margin-top:0}}
+.pipe{display:flex;flex-direction:column;align-items:center;gap:0;margin:18px 0}
+.pipe .node{width:100%;max-width:560px}
+.pipe .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:560px}
+@media(max-width:560px){.pipe .two{grid-template-columns:1fr}}
+.pipe .down{color:var(--accent);height:30px;display:flex;align-items:center}
+.pipe .down svg{width:16px;height:26px}
+#lb{position:fixed;inset:0;background:rgba(15,23,42,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
+footer{border-top:1px solid var(--line);padding:24px 20px;text-align:center;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a href="https://vihaan30g.github.io/">&larr; All Projects</a>
+  <a href="https://github.com/Vihaan30g/manipulation">Repository</a>
+</div></header>
+<main>
+<p class="meta">Robotic Manipulation &middot; ROS 2 &middot; MoveIt 2 &middot; Simulation &middot; Last updated: October 2026</p>
+<h1>Manipulation: MoveIt 2 Workspace for a 5-DoF Arm</h1>
+<p class="lead">A ROS 2 workspace for the manipulator I work on in the MaRS club. It holds the arm's description, a MoveIt 2 motion-planning setup, a Gazebo simulation, and small tools for sending goals to the arm.</p>
+
+<div class="btns">
+  <a class="btn" href="https://github.com/Vihaan30g/manipulation">View repository on GitHub</a>
+  <a class="btn alt" href="#demos">Watch the demos</a>
+</div>
+
+<nav class="toc"><strong>Contents</strong>
+<ol>
+<li><a href="#work">My work in short</a></li>
+<li><a href="#demos">Demos</a></li>
+<li><a href="#structure">Repository structure</a></li>
+<li><a href="#run">Running it</a></li>
+</ol></nav>
+
+<h2 id="work">1. My work in short</h2>
+<p>This repository gathers everything I have done on manipulators. The main workspace, <code>ws_manip_club</code>, is built around a five-joint arm with a two-jaw gripper (base rotation, two pitch joints, and a wrist that pitches and rolls). It contains:</p>
+<ul class="tight">
+<li><strong>Robot description</strong> (<code>gen5manipulator1</code>): the arm's URDF and meshes, a launch file to view it, and its joint names.</li>
+<li><strong>MoveIt 2 configuration</strong> (<code>moveit_pkg2</code>): generated with the MoveIt Setup Assistant and tuned by hand. It uses the OMPL planners, the Pilz Cartesian limits and the <code>pick_ik</code> inverse-kinematics solver, with a <code>body</code> group for the arm and an <code>eef</code> group for the gripper.</li>
+<li><strong>Simulation:</strong> launch files that bring the arm up in Ignition Gazebo with <code>ros2_control</code>, and a second launch file that starts MoveIt, so planned motions run on the simulated arm.</li>
+<li><strong>Control tools:</strong> two scripts that send an exact target pose to MoveIt's <code>move_group</code> through its action interface, and a small slider window that moves each joint directly by publishing joint trajectories.</li>
+</ul>
+<p>To get IK-based planning and execution working, I also modified a parameter in MoveIt 2's own source code, in the file <code>kinematics_base.h</code>.</p>
+
+<h2 id="demos">2. Demos</h2>
+<p>Screen recordings of the arm working in simulation.</p>
+<div class="grid2">
+<figure class="video"><div class="frame"><iframe referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/3qtQS1COaS4?rel=0&playsinline=1" title="Manipulation demo 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+<figcaption>Demo 1</figcaption></figure>
+<figure class="video"><div class="frame"><iframe referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/-cOTMuwLF4M?rel=0&playsinline=1" title="Manipulation demo 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+<figcaption>Demo 2</figcaption></figure>
+<figure class="video"><div class="frame"><iframe referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/VYUWv_lxyFg?rel=0&playsinline=1" title="Manipulation demo 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+<figcaption>Demo 3</figcaption></figure>
+<figure class="video"><div class="frame"><iframe referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/rt28YPzgF5M?rel=0&playsinline=1" title="Manipulation demo 4" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+<figcaption>Demo 4</figcaption></figure>
+</div>
+
+<h2 id="structure">3. Repository structure</h2>
+<pre class="tree">manipulation/
+  ws_manip_club/
+    src/
+      gen5manipulator1/        arm description: URDF, meshes, display launch
+      moveit_pkg2/             MoveIt 2 config, controllers and launch files
+      target_pose1.py          send a pose goal to MoveIt
+      target_pose2.py          send a second pose goal to MoveIt
+      gui_sliders_jointControl.py    joint sliders (tkinter GUI)
+  LICENSE</pre>
+
+<h2 id="run">4. Running it</h2>
+<p>Tested with Ubuntu 22.04, ROS 2 Humble, MoveIt 2 and Ignition Fortress. From the workspace folder, install the dependencies and build, then start the simulation and MoveIt in two terminals:</p>
+<div class="cb"><pre>cd ws_manip_club
+rosdep install --from-paths src --ignore-src -r -y
+colcon build
+source install/setup.bash
+
+# terminal 1: Ignition Gazebo simulation
+ros2 launch moveit_pkg2 ignition_sim.launch.py
+
+# terminal 2: MoveIt 2 with RViz
+ros2 launch moveit_pkg2 moveit.launch.py</pre></div>
+<p>With both running, send a goal with <code>python3 src/target_pose1.py</code>, or move the joints by hand with <code>python3 src/gui_sliders_jointControl.py</code>.</p>
+
+</main>
+<footer>Written by Vihaan Gupta &middot; <a href="https://github.com/Vihaan30g">GitHub</a> &middot; <a href="https://github.com/Vihaan30g/manipulation">This repository</a> &middot; Released under the MIT License &middot; <a href="https://www.youtube.com/@vihaan30g">YouTube</a> &middot; <a href="mailto:vihaan30g@gmail.com">vihaan30g@gmail.com</a></footer>
+<div id="lb"><img alt=""></div>
+<script>
+document.querySelectorAll('.cb').forEach(function(b){
+  var btn=document.createElement('button');btn.textContent='Copy';
+  btn.onclick=function(){
+    var t=b.querySelector('pre').innerText;
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy'},1500)}).catch(function(){btn.textContent='Press Ctrl+C'});
+  };
+  b.appendChild(btn);
+});
+var lb=document.getElementById('lb'),lbi=lb.querySelector('img');
+document.querySelectorAll('.fig img').forEach(function(i){
+  i.addEventListener('click',function(){lbi.src=i.src;lbi.alt=i.alt;lb.style.display='flex'});
+});
+lb.addEventListener('click',function(){lb.style.display='none'});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.style.display='none'});
+// YouTube cannot play embedded videos on pages opened straight from disk (file://).
+if (location.protocol === 'file:') {
+  var first = document.querySelector('.video');
+  if (first) {
+    var d = document.createElement('div');
+    d.className = 'local';
+    d.innerHTML = '<strong>Videos will not play inline here.</strong> You opened this page as a local file, and YouTube only plays embedded videos on pages served over http(s). View it on GitHub Pages, or run <code>python3 -m http.server</code> in the repository folder and open <code>http://localhost:8000</code>.';
+    first.parentNode.insertBefore(d, first);
+  }
+}
+</script>
+</body>
+</html>
